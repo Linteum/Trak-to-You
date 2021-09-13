@@ -1,0 +1,15 @@
+{
+  "name": "Trak-To-You",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jsdom": "^17.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.9.1"
+  }
+}
