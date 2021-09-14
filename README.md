@@ -5,6 +5,7 @@
 HISTORY.html ==> Tracklist.txt
 
 Track-to-You is a simple tool allowing you to convert a traktor HTML tracklist into a clear text format wich is Youtube compatible (Chapters)
+You can find informations about extracting html file here : https://www.traktorbible.com/en/printsetlist.aspx
 
 ## Usage
 Download binary in the release section.
