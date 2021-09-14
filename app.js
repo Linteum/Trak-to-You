@@ -1,5 +1,10 @@
+const fs = require('fs')
 const promFs = require('fs').promises
 const { JSDOM } = require('jsdom')
+const { selectHTMLFile } = require('./modules/user-action')
+const path = require('path')
+const open = require('open')
+const signale = require('signale')
 
 // lire fichier html avec fs (file to string)
 async function extractTabFromPage(filePath = "") {
@@ -8,7 +13,6 @@ async function extractTabFromPage(filePath = "") {
     // console.log(txtFromPage)
     return txtFromPage
 }
-
 
 // isoler la partie représentant le tableau
 function pageToJson(htmlTxtPage) {
@@ -54,10 +58,11 @@ function pageToJson(htmlTxtPage) {
         item['Start Time'] = millisToMinutesAndSeconds(item['Start Time'] - firstSong)
         return item
     })
-    
+
     for (let song of playedSongs) {
         console.log(`${song['Start Time']} - ${song.Title} - ${song.Artist} - ${song.Release}`)
     }
+    return playedSongs
 }
 
 function millisToMinutesAndSeconds(millis) {
@@ -66,10 +71,43 @@ function millisToMinutesAndSeconds(millis) {
     return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 
+function validFilePath(filePath) {
+
+    if (filePath.includes('"')) {
+        filePath = filePath.split('"').join('')
+    }
+    filePath = filePath.trim()
+    if (!fs.existsSync(filePath)) return false
+
+    if (path.extname(filePath) != '.html') return false
+
+    return filePath
+
+}
+
+async function writeTxtFile(sourceFile, content) {
+    sourceFile = path.parse(sourceFile)
+    const date = new Date()
+    const fileName = (`${sourceFile.name}-${date.toJSON()}.txt`).split(':').join('-')
+    const destFile = path.join(sourceFile.dir, fileName)
+
+    await promFs.writeFile(destFile, content)
+    S
+    open(destFile)
+}
+
 const main = async () => {
 
+    const source_file = await selectHTMLFile()
+    if (!validFilePath(source_file)) return console.error("File not valid !")
     const txtPage = await extractTabFromPage()
-    pageToJson(txtPage)
+    const playedSongs = pageToJson(txtPage)
+    let tracklist = ''
+    for (let song of playedSongs) {
+        tracklist += `${song['Start Time']} - ${song.Title} - ${song.Artist} - ${song.Release}\n`
+    }
+    await writeTxtFile(source_file, tracklist)
+
 }
 
 main()
